@@ -9,9 +9,8 @@ function wpfse_uninstall_cleanup() {
     global $wpdb;
     $table_name = $wpdb->prefix . 'wpfse_visits';
 
-    // Löscht die Datenbanktabelle
-    $sql = "DROP TABLE IF EXISTS $table_name;";
-    $wpdb->query($sql);
+    // Löscht die Datenbanktabelle sicher und direkt
+    $wpdb->query("DROP TABLE IF EXISTS `" . esc_sql($table_name) . "`");
 
     // Löscht alle Optionen, die durch das Plugin gesetzt wurden
     delete_option('wpsfse_menu_visited');

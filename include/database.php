@@ -20,6 +20,8 @@ function wpfse_create_db_table() {
         device VARCHAR(50) DEFAULT NULL,
         browser TEXT DEFAULT NULL,
         operating_system VARCHAR(100) DEFAULT NULL,
+        platform VARCHAR(100) DEFAULT NULL,
+        user_agent varchar(255) DEFAULT NULL,
         screen_resolution VARCHAR(20) DEFAULT NULL,
         time_zone VARCHAR(100) DEFAULT NULL,
         referrer_url TEXT DEFAULT NULL,

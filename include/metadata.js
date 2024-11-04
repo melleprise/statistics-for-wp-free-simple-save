@@ -19,6 +19,8 @@ window.addEventListener('load', function() {
     var referrerUrl = document.referrer || 'Direct';
     var price = window.price !== undefined && window.price !== 0 ? window.price : null;
     var timezone = window.userTimezone || 'Unknown';
+    var devicePlatform = navigator.userAgentData ? navigator.userAgentData.platform : navigator.platform;
+    var fullUserAgent = navigator.userAgent;
 
     // console.log("Timezone detected: " + timezone);
 
@@ -38,6 +40,8 @@ window.addEventListener('load', function() {
                 connection_type: connectionType,
                 screen_resolution: screenResolution,
                 location: location,
+		        platform: devicePlatform,
+		        user_agent: fullUserAgent,
                 url: currentUrl,
                 referrer_url: referrerUrl
             };
