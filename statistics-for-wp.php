@@ -6,7 +6,7 @@ Version: 1.0
 Author: MELLEPRISE
 Author URI: https://melleprise.de
 GitHub Plugin URI: https://github.com/melleprise/statistics-for-wp
-Text Domain: wp-statistics-free
+Text Domain: statistics-for-wp-free-simple-save
 License: GPL-2.0+
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 */
