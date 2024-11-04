@@ -1,4 +1,4 @@
-=== WP Statistics Free - Simple & Easy ===
+=== Statistics for WP - Free, Simple & Save ===
 Contributors: melleprise
 Donate link: https://melleprise.de/donate
 Tags: statistics, analytics, simple, lightweight
@@ -13,7 +13,7 @@ Simple, privacy-friendly visitor stats without cookies, paywalls, or ads. Lightw
 
 == Description ==
 
-**WP Statistics Free - Simple & Easy** provides basic, privacy-focused analytics for WordPress. The plugin is lightweight, free of ads, and respects user privacy by not using cookies or tracking personal data. Key statistics like visitor counts, devices, browsers, and referrers are stored locally with minimal impact on performance.
+**Statistics for WP - Free, Simple & Save** provides basic, privacy-focused analytics for WordPress. The plugin is lightweight, free of ads, and respects user privacy by not using cookies or tracking personal data. Key statistics like visitor counts, devices, browsers, and referrers are stored locally with minimal impact on performance.
 
 ### Key Features:
 
@@ -31,7 +31,7 @@ Simple, privacy-friendly visitor stats without cookies, paywalls, or ads. Lightw
 
 == Frequently Asked Questions ==
 
-= Who should use WP Statistics Free - Simple & Easy? =
+= Who should use Statistics for WP - Free, Simple & Save? =
 
 For anyone seeking basic visitor stats without the overhead of complex analytics or data privacy concerns.
 
@@ -41,7 +41,7 @@ No, the plugin does not collect or store any personal data about your visitors.
 
 = Does it use cookies? =
 
-No, WP Statistics Free - Simple & Easy does not use cookies.
+No, Statistics for WP - Free, Simple & Save does not use cookies.
 
 = Will this plugin slow down my website? =
 
@@ -49,7 +49,7 @@ The plugin is designed to be lightweight and have minimal performance impact.
 
 = Are there any external accounts required? =
 
-No, WP Statistics Free - Simple & Easy is fully self-contained.
+No, Statistics for WP - Free, Simple & Save is fully self-contained.
 
 == Changelog ==
 

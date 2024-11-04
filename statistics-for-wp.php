@@ -1,10 +1,11 @@
 <?php
 /*
-Plugin Name: WP Statistics Free - Simple & Easy
-Description: A straightforward statistics plugin with no paywalls, pop-ups, cookies, or heavy database usage. Delivers essential stats without slowing down your site or collecting any personal data. Simple, effective, and privacy-friendly.
+Plugin Name: Statistics for WP - Free, Simple & Save
+Description: No paywalls, pop-ups, cookies, or heavy database load. Provides essential stats without slowing down your site or collecting personal data. Simple, effective, and privacy-friendly. Upon uninstallation, all data is removed, leaving your WordPress as clean as before.
 Version: 1.0
 Author: MELLEPRISE
 Author URI: https://melleprise.de
+GitHub Plugin URI: https://github.com/melleprise/statistics-for-wp
 Text Domain: wp-statistics-free
 License: GPL-2.0+
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -13,34 +14,6 @@ License URI: https://www.gnu.org/licenses/gpl-2.0.html
 // Block direct access to the file
 if (!defined('ABSPATH')) {
     exit;
-}
-
-// Aktion-Links unter dem Plugin-Namen hinzufügen
-add_filter( 'plugin_action_links_' . plugin_basename( __FILE__ ), 'wpsfse_add_action_links' );
-
-function wpsfse_add_action_links( $links ) {
-    $new_links = array(
-        '<a href="' . esc_url( admin_url( 'admin.php?page=wpsfse-dashboard' ) ) . '">' . esc_html__( 'Dashboard', 'wp-statistics-free-simple-easy' ) . '</a>',
-    );
-    return array_merge( $new_links, $links );
-}
-
-// Metadaten-Links neben der Versions- und Autorenangabe hinzufügen
-add_filter( 'plugin_row_meta', 'wpsfse_add_plugin_meta_links', 10, 2 );
-
-function wpsfse_add_plugin_meta_links( $links, $file ) {
-    // Überprüfen, ob es sich um dieses Plugin handelt
-    if ( plugin_basename( __FILE__ ) === $file ) {
-        // Neue Links erstellen
-        $new_links = array(
-            '<a href="https://melleprise.de/kontakt/" target="_blank">' . esc_html__( 'Help', 'wp-statistics-free-simple-easy' ) . '</a>',
-            '<a href="https://melleprise.de/donate" target="_blank">' . esc_html__( 'Donate', 'wp-statistics-free-simple-easy' ) . '</a>',
-        );
-
-        // Die neuen Links zu den bestehenden Links hinzufügen
-        $links = array_merge( $links, $new_links );
-    }
-    return $links;
 }
 
 require_once(plugin_dir_path(__FILE__) . 'include/database.php');
@@ -118,3 +91,31 @@ function wpsfse_delete_warning_script($hook) {
 
 }
 add_action('admin_enqueue_scripts', 'wpsfse_delete_warning_script');
+
+// Aktion-Links unter dem Plugin-Namen hinzufügen
+add_filter( 'plugin_action_links_' . plugin_basename( __FILE__ ), 'wpsfse_add_action_links' );
+
+function wpsfse_add_action_links( $links ) {
+    $new_links = array(
+        '<a href="' . esc_url( admin_url( 'admin.php?page=wpsfse-dashboard' ) ) . '">' . esc_html__( 'Dashboard', 'wp-statistics-free-simple-easy' ) . '</a>',
+    );
+    return array_merge( $new_links, $links );
+}
+
+// Metadaten-Links neben der Versions- und Autorenangabe hinzufügen
+add_filter( 'plugin_row_meta', 'wpsfse_add_plugin_meta_links', 10, 2 );
+
+function wpsfse_add_plugin_meta_links( $links, $file ) {
+    // Überprüfen, ob es sich um dieses Plugin handelt
+    if ( plugin_basename( __FILE__ ) === $file ) {
+        // Neue Links erstellen
+        $new_links = array(
+            '<a href="https://melleprise.de/kontakt/" target="_blank">' . esc_html__( 'Help', 'wp-statistics-free-simple-easy' ) . '</a>',
+            '<a href="https://melleprise.de/donate" target="_blank">' . esc_html__( 'Donate', 'wp-statistics-free-simple-easy' ) . '</a>',
+        );
+
+        // Die neuen Links zu den bestehenden Links hinzufügen
+        $links = array_merge( $links, $new_links );
+    }
+    return $links;
+}
