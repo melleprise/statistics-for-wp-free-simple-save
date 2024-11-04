@@ -1,6 +1,6 @@
 === WP Statistics Free - Simple & Easy ===
 Contributors: melleprise
-Donate link: https://melleprise.com/donate
+Donate link: https://melleprise.de/donate
 Tags: statistics, analytics, simple, lightweight
 Requires at least: 5.0
 Tested up to: 6.6

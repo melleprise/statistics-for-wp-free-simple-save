@@ -4,13 +4,43 @@ Plugin Name: WP Statistics Free - Simple & Easy
 Description: A straightforward statistics plugin with no paywalls, pop-ups, cookies, or heavy database usage. Delivers essential stats without slowing down your site or collecting any personal data. Simple, effective, and privacy-friendly.
 Version: 1.0
 Author: MELLEPRISE
-Author URI: https://melleprise.com
-License: GPL2
+Author URI: https://melleprise.de
+Text Domain: wp-statistics-free
+License: GPL-2.0+
+License URI: https://www.gnu.org/licenses/gpl-2.0.html
 */
 
 // Block direct access to the file
 if (!defined('ABSPATH')) {
     exit;
+}
+
+// Aktion-Links unter dem Plugin-Namen hinzufügen
+add_filter( 'plugin_action_links_' . plugin_basename( __FILE__ ), 'wpsfse_add_action_links' );
+
+function wpsfse_add_action_links( $links ) {
+    $new_links = array(
+        '<a href="' . esc_url( admin_url( 'admin.php?page=wpsfse-dashboard' ) ) . '">' . esc_html__( 'Dashboard', 'wp-statistics-free-simple-easy' ) . '</a>',
+    );
+    return array_merge( $new_links, $links );
+}
+
+// Metadaten-Links neben der Versions- und Autorenangabe hinzufügen
+add_filter( 'plugin_row_meta', 'wpsfse_add_plugin_meta_links', 10, 2 );
+
+function wpsfse_add_plugin_meta_links( $links, $file ) {
+    // Überprüfen, ob es sich um dieses Plugin handelt
+    if ( plugin_basename( __FILE__ ) === $file ) {
+        // Neue Links erstellen
+        $new_links = array(
+            '<a href="https://melleprise.de/kontakt/" target="_blank">' . esc_html__( 'Help', 'wp-statistics-free-simple-easy' ) . '</a>',
+            '<a href="https://melleprise.de/donate" target="_blank">' . esc_html__( 'Donate', 'wp-statistics-free-simple-easy' ) . '</a>',
+        );
+
+        // Die neuen Links zu den bestehenden Links hinzufügen
+        $links = array_merge( $links, $new_links );
+    }
+    return $links;
 }
 
 require_once(plugin_dir_path(__FILE__) . 'include/database.php');
@@ -84,49 +114,7 @@ function wpsfse_delete_warning_script($hook) {
     
     wp_register_script('wpsfse_delete_warning_js', plugins_url('include/delete-warning.js', __FILE__), array('jquery'), time(), true);
 
-    // wp_enqueue_style('wpsfse_delete_warning_css', plugins_url('include/delete-warning.css', __FILE__));
-
     wp_enqueue_script('wpsfse_delete_warning_js');
-    // wp_enqueue_script('wpsfse_delete_warning_js', 'wpsfse_delete_warning_css');
+
 }
 add_action('admin_enqueue_scripts', 'wpsfse_delete_warning_script');
-
-// // Function to display visit count in the admin dashboard
-// function wpsfse_dashboard_widget() {
-//     global $wpdb;
-//     $table_name = $wpdb->prefix . 'wpsfse_visits';
-
-//     // Get total visit count
-//     $visit_count = $wpdb->get_var("SELECT COUNT(*) FROM $table_name");
-
-//     echo '<p>Total Visits: ' . esc_html($visit_count) . '</p>';
-// }
-// function wpsfse_add_dashboard_widgets() {
-//     wp_add_dashboard_widget(
-//         'wpsfse_dashboard_widget',
-//         'WP Statistics Free, Simple & Easy',
-//         'wpsfse_dashboard_widget'
-//     );
-// }
-// add_action('wp_dashboard_setup', 'wpsfse_add_dashboard_widgets');
-
-// // Function to record each visit
-// function wpsfse_record_visit() {
-//     if (is_user_logged_in()) {
-//         return; // Avoid logging visits from logged-in users
-//     }
-
-//     global $wpdb;
-//     $table_name = $wpdb->prefix . 'wpsfse_visits';
-//     $ip_address = $_SERVER['REMOTE_ADDR'];
-
-//     // Insert visit record without collecting any personal info or cookies
-//     $wpdb->insert(
-//         $table_name,
-//         array(
-//             'visit_date' => current_time('mysql'),
-//             'ip_address' => $ip_address,
-//         )
-//     );
-// }
-// add_action('wp_footer', 'wpsfse_record_visit');
