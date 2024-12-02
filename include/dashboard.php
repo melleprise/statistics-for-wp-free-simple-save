@@ -31,55 +31,53 @@ if ( isset( $_GET['paged'] ) ) {
 
 $offset = ( $page - 1 ) * $items_per_page;
 
+// Setting für Admin-Ergebnisse abrufen
+$show_admin_results = get_option( 'wpsfse_show_admin_results', 'yes' );
+
+// SQL-Bedingung basierend auf der Einstellung
+$admin_filter = ( $show_admin_results === 'no' ) ? "WHERE admin != 'yes'" : '';
+
 // Gesamtbesuche zählen
+$total_visits_query = "SELECT COUNT(*) FROM {$wpdb->prefix}wp_statistics_free_metadata $admin_filter";
 $total_visits = wp_cache_get( 'wpsfse_total_visits', 'wpsfse' );
 if ( false === $total_visits ) {
-    // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Direkte Abfrage erforderlich, Caching implementiert
-    $total_visits = $wpdb->get_var(
-        "SELECT COUNT(*) FROM {$wpdb->prefix}wp_statistics_free_metadata"
-    );
+    $total_visits = $wpdb->get_var( $total_visits_query );
     wp_cache_set( 'wpsfse_total_visits', $total_visits, 'wpsfse', 3600 );
 }
 
 // Besuche heute zählen
 $total_visits_today_key = 'wpsfse_total_visits_today_' . gmdate( 'Ymd' );
+$today_visits_query = "SELECT COUNT(*) FROM {$wpdb->prefix}wp_statistics_free_metadata WHERE visit_date >= %s";
+if ( $show_admin_results === 'no' ) {
+    $today_visits_query .= " AND admin != 'yes'";
+}
 $today_visits = wp_cache_get( $total_visits_today_key, 'wpsfse' );
 if ( false === $today_visits ) {
-    // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Direkte Abfrage erforderlich, Caching implementiert
-    $today_visits = $wpdb->get_var(
-        $wpdb->prepare(
-            "SELECT COUNT(*) FROM {$wpdb->prefix}wp_statistics_free_metadata WHERE visit_date >= %s",
-            $today_start
-        )
-    );
+    $today_visits = $wpdb->get_var( $wpdb->prepare( $today_visits_query, $today_start ) );
     wp_cache_set( $total_visits_today_key, $today_visits, 'wpsfse', 3600 );
 }
 
 // Besuche diese Woche zählen
 $total_visits_week_key = 'wpsfse_total_visits_week_' . gmdate( 'YW' );
+$week_visits_query = "SELECT COUNT(*) FROM {$wpdb->prefix}wp_statistics_free_metadata WHERE visit_date >= %s";
+if ( $show_admin_results === 'no' ) {
+    $week_visits_query .= " AND admin != 'yes'";
+}
 $week_visits = wp_cache_get( $total_visits_week_key, 'wpsfse' );
 if ( false === $week_visits ) {
-    // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Direkte Abfrage erforderlich, Caching implementiert
-    $week_visits = $wpdb->get_var(
-        $wpdb->prepare(
-            "SELECT COUNT(*) FROM {$wpdb->prefix}wp_statistics_free_metadata WHERE visit_date >= %s",
-            $week_start
-        )
-    );
+    $week_visits = $wpdb->get_var( $wpdb->prepare( $week_visits_query, $week_start ) );
     wp_cache_set( $total_visits_week_key, $week_visits, 'wpsfse', 3600 );
 }
 
 // Besuche diesen Monat zählen
 $total_visits_month_key = 'wpsfse_total_visits_month_' . gmdate( 'Ym' );
+$month_visits_query = "SELECT COUNT(*) FROM {$wpdb->prefix}wp_statistics_free_metadata WHERE visit_date >= %s";
+if ( $show_admin_results === 'no' ) {
+    $month_visits_query .= " AND admin != 'yes'";
+}
 $month_visits = wp_cache_get( $total_visits_month_key, 'wpsfse' );
 if ( false === $month_visits ) {
-    // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Direkte Abfrage erforderlich, Caching implementiert
-    $month_visits = $wpdb->get_var(
-        $wpdb->prepare(
-            "SELECT COUNT(*) FROM {$wpdb->prefix}wp_statistics_free_metadata WHERE visit_date >= %s",
-            $month_start
-        )
-    );
+    $month_visits = $wpdb->get_var( $wpdb->prepare( $month_visits_query, $month_start ) );
     wp_cache_set( $total_visits_month_key, $month_visits, 'wpsfse', 3600 );
 }
 
@@ -95,24 +93,16 @@ echo '<div class="statistics-counters">
 echo '</div>';
 
 // Gesamtanzahl der Einträge abrufen
+$total_items_query = "SELECT COUNT(*) FROM {$wpdb->prefix}wp_statistics_free_metadata $admin_filter";
 $total_items = wp_cache_get( 'wpsfse_total_items', 'wpsfse' );
 if ( false === $total_items ) {
-    // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Direkte Abfrage erforderlich, Caching implementiert
-    $total_items = $wpdb->get_var(
-        "SELECT COUNT(*) FROM {$wpdb->prefix}wp_statistics_free_metadata"
-    );
+    $total_items = $wpdb->get_var( $total_items_query );
     wp_cache_set( 'wpsfse_total_items', $total_items, 'wpsfse', 600 );
 }
 
 // Daten für die aktuelle Seite abrufen
-// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Direkte Abfrage erforderlich
-$results = $wpdb->get_results(
-    $wpdb->prepare(
-        "SELECT * FROM {$wpdb->prefix}wp_statistics_free_metadata ORDER BY visit_date DESC LIMIT %d OFFSET %d",
-        $items_per_page,
-        $offset
-    )
-);
+$data_query = "SELECT * FROM {$wpdb->prefix}wp_statistics_free_metadata $admin_filter ORDER BY visit_date DESC LIMIT %d OFFSET %d";
+$results = $wpdb->get_results( $wpdb->prepare( $data_query, $items_per_page, $offset ) );
 
 // Tabelle anzeigen
 echo '<div class="content-container">';

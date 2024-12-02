@@ -37,33 +37,40 @@ function save_metadata_via_ajax() {
     // Verarbeitung von $_SERVER['HTTP_USER_AGENT']
     if ( isset( $_SERVER['HTTP_USER_AGENT'] ) ) {
         $user_agent_raw = wp_unslash( $_SERVER['HTTP_USER_AGENT'] );
-        // Verwenden Sie die rohe user_agent-Zeichenkette für die Erkennungsfunktionen
-        $user_agent = $user_agent_raw;
+        $user_agent = sanitize_text_field( $user_agent_raw );
     } else {
         $user_agent = '';
     }
 
     // Verarbeitung von $_SERVER['HTTP_ACCEPT_LANGUAGE']
     if ( isset( $_SERVER['HTTP_ACCEPT_LANGUAGE'] ) ) {
-        $accept_language_raw      = wp_unslash( $_SERVER['HTTP_ACCEPT_LANGUAGE'] );
+        $accept_language_raw = wp_unslash( $_SERVER['HTTP_ACCEPT_LANGUAGE'] );
         $accept_language_sanitized = sanitize_text_field( $accept_language_raw );
-        $languages                = substr( $accept_language_sanitized, 0, 2 );
+        $languages = substr( $accept_language_sanitized, 0, 2 );
     } else {
         $languages = '';
     }
 
-    $device           = get_device_type( $user_agent );
-    $browser          = detect_browser( $user_agent );
+    $device = get_device_type( $user_agent );
+    $browser = detect_browser( $user_agent );
     $operating_system = get_operating_system_with_version( $user_agent );
-    $platform         = isset( $_POST['platform'] ) ? sanitize_text_field( wp_unslash( $_POST['platform'] ) ) : 'unknown';
+    $platform = isset( $_POST['platform'] ) ? sanitize_text_field( wp_unslash( $_POST['platform'] ) ) : 'unknown';
     $screen_resolution = isset( $_POST['screen_resolution'] ) ? sanitize_text_field( wp_unslash( $_POST['screen_resolution'] ) ) : 'unknown';
-    $timezone         = isset( $_POST['timezone'] ) ? sanitize_text_field( wp_unslash( $_POST['timezone'] ) ) : 'Unknown';
-    $connection_type  = isset( $_POST['connection_type'] ) ? sanitize_text_field( wp_unslash( $_POST['connection_type'] ) ) : 'unknown';
-    $page_load_time   = isset( $_POST['page_load_time'] ) ? floatval( wp_unslash( $_POST['page_load_time'] ) ) : 0;
-    $location         = isset( $_POST['location'] ) ? sanitize_text_field( wp_unslash( $_POST['location'] ) ) : 'unknown';
-    $current_url      = isset( $_POST['url'] ) ? esc_url_raw( wp_unslash( $_POST['url'] ) ) : 'unknown';
-    $referrer_url     = isset( $_POST['referrer_url'] ) ? esc_url_raw( wp_unslash( $_POST['referrer_url'] ) ) : 'Direct';
-    $ip_address       = isset( $_SERVER['REMOTE_ADDR'] ) ? sanitize_text_field( wp_unslash( $_SERVER['REMOTE_ADDR'] ) ) : 'unknown';
+    $timezone = isset( $_POST['timezone'] ) ? sanitize_text_field( wp_unslash( $_POST['timezone'] ) ) : 'Unknown';
+    $connection_type = isset( $_POST['connection_type'] ) ? sanitize_text_field( wp_unslash( $_POST['connection_type'] ) ) : 'unknown';
+    $page_load_time = isset( $_POST['page_load_time'] ) ? floatval( wp_unslash( $_POST['page_load_time'] ) ) : 0;
+    $location = isset( $_POST['location'] ) ? sanitize_text_field( wp_unslash( $_POST['location'] ) ) : 'unknown';
+    $current_url = isset( $_POST['url'] ) ? esc_url_raw( wp_unslash( $_POST['url'] ) ) : 'unknown';
+    $referrer_url = isset( $_POST['referrer_url'] ) ? esc_url_raw( wp_unslash( $_POST['referrer_url'] ) ) : 'Direct';
+    $ip_address = isset( $_SERVER['REMOTE_ADDR'] ) ? sanitize_text_field( wp_unslash( $_SERVER['REMOTE_ADDR'] ) ) : 'unknown';
+
+    // Admin-Feld setzen basierend auf Benutzerkontext oder Cookie
+    $is_admin = 'no';
+    if ( current_user_can( 'manage_options' ) ) {
+        $is_admin = 'yes'; // Benutzer ist Admin
+    } elseif ( isset( $_COOKIE['wpsfse_is_admin'] ) && $_COOKIE['wpsfse_is_admin'] === 'yes' ) {
+        $is_admin = 'yes'; // Cookie zeigt Adminstatus an
+    }
 
     // Bevor Sie $user_agent in die Datenbank speichern, bereinigen Sie es
     $user_agent_db = sanitize_text_field( $user_agent );
@@ -71,14 +78,13 @@ function save_metadata_via_ajax() {
     // Cache Key für Duplikatsvermeidung
     $cache_key = 'wpsfse_metadata_' . md5( serialize( compact(
         'device', 'browser', 'operating_system', 'platform', 'screen_resolution', 'timezone', 'referrer_url',
-        'current_url', 'languages', 'connection_type', 'page_load_time', 'location', 'ip_address'
+        'current_url', 'languages', 'connection_type', 'page_load_time', 'location', 'ip_address', 'is_admin'
     ) ) );
     if ( false === wp_cache_get( $cache_key, 'wpsfse' ) ) {
 
         // Daten in die Tabelle einfügen
         $table_name_metadata = $wpdb->prefix . 'wp_statistics_free_metadata';
 
-        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery -- Verwendung von $wpdb->insert() ist sicher
         $insert_result = $wpdb->insert(
             $table_name_metadata,
             array(
@@ -97,6 +103,7 @@ function save_metadata_via_ajax() {
                 'ip_address'        => $ip_address,
                 'user_agent'        => $user_agent_db,
                 'visit_date'        => current_time( 'mysql', 1 ), // GMT Zeit
+                'admin'             => $is_admin, // Admin-Feld
             ),
             array(
                 '%s', // device
@@ -114,6 +121,7 @@ function save_metadata_via_ajax() {
                 '%s', // ip_address
                 '%s', // user_agent
                 '%s', // visit_date
+                '%s', // admin
             )
         );
 
@@ -128,6 +136,7 @@ function save_metadata_via_ajax() {
     }
 }
 
+// add_action( 'wp_ajax_save_metadata', 'save_metadata_via_ajax' );
 add_action( 'wp_ajax_save_metadata', 'save_metadata_via_ajax' );
 add_action( 'wp_ajax_nopriv_save_metadata', 'save_metadata_via_ajax' );
 

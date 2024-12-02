@@ -30,6 +30,7 @@ function wpfse_create_db_table() {
         connection_type VARCHAR(10) DEFAULT NULL,
         page_load_time FLOAT DEFAULT NULL,
         location VARCHAR(255) DEFAULT NULL,
+        admin ENUM('yes', 'no') DEFAULT 'no' NOT NULL,
         PRIMARY KEY (id)
     ) $charset_collate;";
 
